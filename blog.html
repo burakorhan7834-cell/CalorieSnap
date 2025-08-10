@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beslenme Rehberi | Kalori Hesaplama</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Sağlıklı beslenme, kalori yönetimi ve diyet planları hakkında uzman makaleler. Kilo verme, kas yapma ve metabolizma hızlandırma rehberleri.">
+    <!-- Chart.js kütüphanesi -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- i18next kütüphanesi -->
+    <script src="https://cdn.jsdelivr.net/npm/i18next@21.6.10/i18next.min.js"></script>
+    <!-- Firebase kütüphaneleri -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="index.html" data-i18n="site.title">Kalori Hesaplama</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" data-i18n="nav.home">Ana Sayfa</a></li>
+                    <li><a href="hakkinda.html" data-i18n="nav.about">Hakkında</a></li>
+                    <li><a href="#" class="active" data-i18n="nav.blog">Beslenme Rehberi</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="tr">Türkçe</option>
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+                <div class="theme-toggle">
+                    <button id="theme-toggle-btn">
+                        <i class="theme-icon light">☀️</i>
+                        <i class="theme-icon dark">🌙</i>
+                    </button>
+                </div>
+                <div class="auth-buttons">
+                    <button id="login-btn" class="btn-small" data-i18n="auth.login">Giriş Yap</button>
+                    <button id="register-btn" class="btn-small" data-i18n="auth.register">Kayıt Ol</button>
+                    <div class="user-menu hidden">
+                        <button id="profile-btn" class="btn-small" data-i18n="user_profile.title">Profil</button>
+                        <button id="logout-btn" class="btn-small" data-i18n="auth.logout">Çıkış</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h2 data-i18n="blog.title">Beslenme Rehberi</h2>
+                <p data-i18n="blog.subtitle">Sağlıklı beslenme ve kalori yönetimi hakkında faydalı makaleler</p>
+            </div>
+        </section>
+
+        <section class="blog-content">
+            <div class="container">
+                <div id="blog-posts-container">
+                    <!-- Blog içeriği JavaScript ile doldurulacak -->
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <h2>Günlük Kalori İhtiyacınızı Hesaplayın</h2>
+                <p>Kişisel hedeflerinize uygun beslenme planı oluşturmak için ilk adımı atın.</p>
+                <a href="index.html" class="btn-primary">Kalori Hesaplayıcı</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4 data-i18n="footer.about.title">Hakkımızda</h4>
+                    <p data-i18n="footer.about.description">Kalori Hesaplama, sağlıklı beslenme ve kilo yönetimi konusunda güvenilir bilgiler sunan bir platformdur.</p>
+                </div>
+                <div class="footer-section">
+                    <h4 data-i18n="footer.links.title">Hızlı Bağlantılar</h4>
+                    <ul>
+                        <li><a href="index.html" data-i18n="nav.home">Ana Sayfa</a></li>
+                        <li><a href="hakkinda.html" data-i18n="nav.about">Hakkında</a></li>
+                        <li><a href="blog.html" data-i18n="nav.blog">Beslenme Rehberi</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-i18n="footer.contact.title">İletişim</h4>
+                    <p data-i18n="footer.contact.email">E-posta: info@kalorihesaplama.com</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="current-year">2023</span> <span data-i18n="footer.copyright">Kalori Hesaplama. Tüm hakları saklıdır.</span></p>
+                <p data-i18n="footer.disclaimer">Bu sitedeki bilgiler sadece bilgilendirme amaçlıdır ve tıbbi tavsiye yerine geçmez.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Modals -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="auth.login_title">Giriş Yap</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email" data-i18n="auth.email">E-posta</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password" data-i18n="auth.password">Şifre</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" data-i18n="auth.login">Giriş Yap</button>
+                <p><a href="#" id="forgot-password" data-i18n="auth.forgot_password">Şifremi Unuttum</a></p>
+            </form>
+        </div>
+    </div>
+    
+    <div id="register-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="auth.register_title">Kayıt Ol</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name" data-i18n="auth.name">Ad Soyad</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email" data-i18n="auth.email">E-posta</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password" data-i18n="auth.password">Şifre</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password" data-i18n="auth.confirm_password">Şifre Tekrar</label>
+                    <input type="password" id="register-confirm-password" required>
+                </div>
+                <button type="submit" data-i18n="auth.register">Kayıt Ol</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="weight-tracker-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="weight_tracker.title">Kilo Takibi</h2>
+            <div id="weight-tracker-container">
+                <div class="weight-form-container">
+                    <form id="weight-form">
+                        <div class="form-group">
+                            <label for="weight-date" data-i18n="weight_tracker.date">Tarih</label>
+                            <input type="date" id="weight-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="weight-value" data-i18n="weight_tracker.weight">Kilo (kg)</label>
+                            <input type="number" id="weight-value" step="0.1" min="30" max="200" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="weight-note" data-i18n="weight_tracker.note">Not (Opsiyonel)</label>
+                            <textarea id="weight-note"></textarea>
+                        </div>
+                        <button type="submit" data-i18n="weight_tracker.add">Ekle</button>
+                    </form>
+                </div>
+                <div class="weight-chart-container">
+                    <canvas id="weight-chart"></canvas>
+                </div>
+                <div class="weight-stats">
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="weight_tracker.stats.start">Başlangıç:</span>
+                        <span id="weight-start">--</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="weight_tracker.stats.current">Güncel:</span>
+                        <span id="weight-current">--</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="weight_tracker.stats.change">Değişim:</span>
+                        <span id="weight-change">--</span>
+                    </div>
+                </div>
+                <div class="weight-entries">
+                    <h3 data-i18n="weight_tracker.history">Kilo Geçmişi</h3>
+                    <div id="weight-entries-list">
+                        <!-- JavaScript ile doldurulacak -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="food-recognition-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="food_recognition.title">Yemek Tanıma</h2>
+            <div id="food-recognition-container">
+                <div class="food-upload-container">
+                    <form id="food-upload-form">
+                        <div class="form-group">
+                            <label for="food-image" data-i18n="food_recognition.upload_image">Yemek Fotoğrafı Yükle</label>
+                            <input type="file" id="food-image" accept="image/*" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="food-name" data-i18n="food_recognition.food_name">Yemek Adı (Opsiyonel)</label>
+                            <input type="text" id="food-name">
+                        </div>
+                        <button type="submit" data-i18n="food_recognition.analyze">Analiz Et</button>
+                    </form>
+                </div>
+                <div class="food-results hidden" id="food-results">
+                    <div class="food-image-preview">
+                        <img id="food-preview" src="" alt="Yemek Önizleme">
+                    </div>
+                    <div class="food-nutrition">
+                        <h3 data-i18n="food_recognition.nutrition_info">Besin Değerleri</h3>
+                        <div id="food-nutrition-info">
+                            <!-- JavaScript ile doldurulacak -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="user-profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="user_profile.title">Kullanıcı Profili</h2>
+            <form id="user-profile-form">
+                <div class="form-group">
+                    <label for="profile-name" data-i18n="user_profile.display_name">Görünen Ad</label>
+                    <input type="text" id="profile-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-gender" data-i18n="calculator.common.gender">Cinsiyet</label>
+                    <select id="profile-gender" required>
+                        <option value="" data-i18n="calculator.common.select">Seçiniz</option>
+                        <option value="erkek" data-i18n="calculator.common.male">Erkek</option>
+                        <option value="kadin" data-i18n="calculator.common.female">Kadın</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="profile-birthdate" data-i18n="user_profile.birthdate">Doğum Tarihi</label>
+                    <input type="date" id="profile-birthdate" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-height" data-i18n="calculator.common.height">Boy (cm)</label>
+                    <input type="number" id="profile-height" min="120" max="220" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-weight" data-i18n="calculator.common.weight">Kilo (kg)</label>
+                    <input type="number" id="profile-weight" min="30" max="200" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-activity" data-i18n="calculator.common.activity">Aktivite Seviyesi</label>
+                    <select id="profile-activity" required>
+                        <option value="" data-i18n="calculator.common.select">Seçiniz</option>
+                        <option value="1.2" data-i18n="calculator.common.activity_level.sedentary">Sedanter (Hareketsiz yaşam)</option>
+                        <option value="1.375" data-i18n="calculator.common.activity_level.light">Hafif Aktif (Haftada 1-3 gün egzersiz)</option>
+                        <option value="1.55" data-i18n="calculator.common.activity_level.moderate">Orta Aktif (Haftada 3-5 gün egzersiz)</option>
+                        <option value="1.725" data-i18n="calculator.common.activity_level.very">Çok Aktif (Haftada 6-7 gün egzersiz)</option>
+                        <option value="1.9" data-i18n="calculator.common.activity_level.extra">Ekstra Aktif (Günde 2 kez egzersiz)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="profile-goal" data-i18n="user_profile.goal">Hedef</label>
+                    <select id="profile-goal" required>
+                        <option value="" data-i18n="calculator.common.select">Seçiniz</option>
+                        <option value="lose" data-i18n="calculator.macro.goals.lose">Kilo Vermek</option>
+                        <option value="maintain" data-i18n="calculator.macro.goals.maintain">Kiloyu Korumak</option>
+                        <option value="gain" data-i18n="calculator.macro.goals.gain">Kas Kazanmak</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="profile-language" data-i18n="user_profile.language">Tercih Edilen Dil</label>
+                    <select id="profile-language" required>
+                        <option value="tr">Türkçe</option>
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+                <button type="submit" data-i18n="user_profile.save">Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Yeni eklenen JavaScript dosyaları -->
+    <script src="js/i18n.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/food-recognition.js"></script>
+    <script src="js/calculators.js"></script>
+    <script src="js/food-data.js"></script>
+    <script src="js/weight-tracker.js"></script>
+    <script src="js/user-profile.js"></script>
+    <script src="js/blog-content.js"></script>
+</body>
+</html>

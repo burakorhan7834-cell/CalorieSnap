@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-translate="title">Kalori Hesaplama</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--muted:#6b7280;--accent:#2563eb}
+    *{box-sizing:border-box}
+    body{font-family:Inter,Segoe UI,system-ui,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:#0f172a}
+    .container{max-width:980px;margin:32px auto;padding:20px}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand h1{font-size:20px;margin:0}
+    .flags{display:flex;gap:8px}
+    .flag-btn{width:36px;height:24px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid #e6edf6;cursor:pointer}
+    main{display:grid;grid-template-columns:1fr 360px;gap:20px}
+    .card{background:var(--card);padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    .hero p{margin:8px 0 0;color:var(--muted)}
+    form .row{display:flex;gap:12px;margin-bottom:12px}
+    label{display:block;font-size:14px;margin-bottom:6px}
+    input[type="number"],select{width:100%;padding:10px;border:1px solid #e6edf6;border-radius:8px;font-size:14px}
+    .radio-row{display:flex;gap:12px;align-items:center}
+    .actions{display:flex;gap:12px;margin-top:12px}
+    button{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+    button.secondary{background:#eef2ff;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+    .result-number{font-weight:700;font-size:18px}
+    .muted{color:var(--muted);font-size:13px}
+    @media (max-width:900px){main{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <img src="images/hero-image.svg" alt="logo" width="44" height="44"/>
+        <div>
+          <h1 data-translate="title">Kalori Hesaplama</h1>
+          <div class="muted" data-translate="subtitle">Kişiselleştirilmiş kalori hesaplama aracı</div>
+        </div>
+      </div>
+
+      <div class="flags" aria-hidden="true">
+        <!-- Görsellerin yolunuza göre ayarlayın. Eğer yoksa butonlar metin gösterir. -->
+        <button class="flag-btn" data-lang="tr" title="Türkçe"><img src="images/flags/tr.svg" alt="TR" style="width:100%;height:100%"/></button>
+        <button class="flag-btn" data-lang="en" title="English"><img src="images/flags/en.svg" alt="EN" style="width:100%;height:100%"/></button>
+        <button class="flag-btn" data-lang="de" title="Deutsch"><img src="images/flags/de.svg" alt="DE" style="width:100%;height:100%"/></button>
+        <button class="flag-btn" data-lang="es" title="Español"><img src="images/flags/es.svg" alt="ES" style="width:100%;height:100%"/></button>
+        <button class="flag-btn" data-lang="ru" title="Русский"><img src="images/flags/ru.svg" alt="RU" style="width:100%;height:100%"/></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="card hero">
+        <h2 data-translate="calculatorHeading">Kalori Hesaplama</h2>
+        <p data-translate="heroText">Mifflin-St Jeor formülünü kullanarak bazal metabolizma hızınızı (BMR) ve günlük tahmini enerji harcamanızı (TDEE) hesaplayın.</p>
+
+        <form id="calorieForm" onsubmit="event.preventDefault(); calculateCalories();">
+          <div class="row">
+            <div style="flex:1">
+              <label for="weight" data-translate="weightLabel">Kilo (kg)</label>
+              <input id="weight" type="number" inputmode="decimal" min="0" step="any" placeholder="" data-translate-placeholder="weightPlaceholder" />
+            </div>
+            <div style="flex:1">
+              <label for="height" data-translate="heightLabel">Boy (cm)</label>
+              <input id="height" type="number" inputmode="decimal" min="0" step="any" placeholder="" data-translate-placeholder="heightPlaceholder" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label for="age" data-translate="ageLabel">Yaş</label>
+              <input id="age" type="number" inputmode="numeric" min="0" step="1" placeholder="" data-translate-placeholder="agePlaceholder" />
+            </div>
+            <div style="flex:1">
+              <label data-translate="sexLabel">Cinsiyet</label>
+              <div class="radio-row">
+                <label><input type="radio" name="sex" value="male" checked/> <span data-translate="male">Erkek</span></label>
+                <label><input type="radio" name="sex" value="female"/> <span data-translate="female">Kadın</span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label for="activity" data-translate="activityLabel">Aktivite</label>
+              <select id="activity">
+                <option value="1.2" data-translate="activity0">Hareketsiz (az hareket)</option>
+                <option value="1.375" data-translate="activity1">Hafif aktif (1-3 gün/hafta)</option>
+                <option value="1.55" data-translate="activity2">Orta aktif (3-5 gün/hafta)</option>
+                <option value="1.725" data-translate="activity3">Çok aktif (6-7 gün/hafta)</option>
+                <option value="1.9" data-translate="activity4">Çok ağır iş/çok egzersiz</option>
+              </select>
+            </div>
+            <div style="flex:1">
+              <label for="goal" data-translate="goalLabel">Hedef</label>
+              <select id="goal">
+                <option value="maintain" data-translate="goalMaintain">Koruma</option>
+                <option value="mild" data-translate="goalMildLoss">Hafif kilo kaybı (-10%)</option>
+                <option value="loss" data-translate="goalLoss">Kilo kaybı (-20%)</option>
+                <option value="aggressive" data-translate="goalAggressiveLoss">Hızlı kilo kaybı (-25%)</option>
+                <option value="gain" data-translate="goalGain">Kilo alma (+10%)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label for="units" data-translate="unitsLabel">Birimler</label>
+              <select id="units">
+                <option value="metric" data-translate="unitsMetric">Metrik (kg, cm)</option>
+                <option value="imperial" data-translate="unitsImperial">İmperial (lb, in)</option>
+              </select>
+            </div>
+            <div style="flex:1;display:flex;align-items:flex-end;">
+              <div class="actions" style="margin-left:auto">
+                <button type="button" id="calculateBtn" onclick="calculateCalories()" data-translate="calculateBtn">Hesapla</button>
+                <button type="button" class="secondary" id="resetBtn" onclick="resetForm()" data-translate="resetBtn">Sıfırla</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div id="error" role="alert" aria-live="polite" style="color:#b91c1c;margin-top:8px;display:none"></div>
+      </section>
+
+      <aside class="card">
+        <h3 data-translate="resultLabel">Sonuç</h3>
+        <div style="margin-top:12px">
+          <div class="muted" data-translate="bmrLabel">BMR</div>
+          <div id="bmrResult" class="result-number" aria-live="polite">—</div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="muted" data-translate="tdeeLabel">TDEE</div>
+          <div id="tdeeResult" class="result-number" aria-live="polite">—</div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="muted" data-translate="goalCalLabel">Hedef için önerilen günlük kalori</div>
+          <div id="goalResult" class="result-number" aria-live="polite">—</div>
+        </div>
+
+        <hr style="margin:16px 0;border:none;border-top:1px solid #f1f5f9" />
+        <div class="muted" style="font-size:13px" data-translate="disclaimer">Sonuçlar yalnızca tahmini değerlerdir.</div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    // -------------------- Translations --------------------
+    const translations = {
+      tr: {
+        title: "Kalori Hesaplama",
+        subtitle: "Kişiselleştirilmiş kalori hesaplama aracı",
+        calculatorHeading: "Kalori Hesaplama",
+        heroText: "Mifflin-St Jeor formülünü kullanarak bazal metabolizma hızınızı (BMR) ve günlük tahmini enerji harcamanızı (TDEE) hesaplayın.",
+        weightLabel: "Kilo (kg)",
+        weightPlaceholder: "Örn. 72",
+        heightLabel: "Boy (cm)",
+        heightPlaceholder: "Örn. 175",
+        ageLabel: "Yaş",
+        agePlaceholder: "Örn. 30",
+        sexLabel: "Cinsiyet",
+        male: "Erkek",
+        female: "Kadın",
+        activityLabel: "Aktivite",
+        activity0: "Hareketsiz (az hareket)",
+        activity1: "Hafif aktif (1-3 gün/hafta)",
+        activity2: "Orta aktif (3-5 gün/hafta)",
+        activity3: "Çok aktif (6-7 gün/hafta)",
+        activity4: "Çok ağır iş/çok egzersiz",
+        goalLabel: "Hedef",
+        goalMaintain: "Koruma",
+        goalMildLoss: "Hafif kilo kaybı (-10%)",
+        goalLoss: "Kilo kaybı (-20%)",
+        goalAggressiveLoss: "Hızlı kilo kaybı (-25%)",
+        goalGain: "Kilo alma (+10%)",
+        unitsLabel: "Birimler",
+        unitsMetric: "Metrik (kg, cm)",
+        unitsImperial: "İmperial (lb, in)",
+        calculateBtn: "Hesapla",
+        resetBtn: "Sıfırla",
+        resultLabel: "Sonuç",
+        bmrLabel: "BMR",
+        tdeeLabel: "TDEE",
+        goalCalLabel: "Hedef için önerilen günlük kalori",
+        disclaimer: "Sonuçlar yalnızca tahmini değerlerdir.",
+        errorInvalid: "Lütfen tüm alanları doğru doldurun.",
+      },
+      en: {
+        title: "Calorie Calculator",
+        subtitle: "Personalized calorie calculator",
+        calculatorHeading: "Calorie Calculator",
+        heroText: "Calculate your Basal Metabolic Rate (BMR) and estimated daily energy expenditure (TDEE) using the Mifflin–St Jeor equation.",
+        weightLabel: "Weight (kg)",
+        weightPlaceholder: "e.g. 72",
+        heightLabel: "Height (cm)",
+        heightPlaceholder: "e.g. 175",
+        ageLabel: "Age",
+        agePlaceholder: "e.g. 30",
+        sexLabel: "Sex",
+        male: "Male",
+        female: "Female",
+        activityLabel: "Activity Level",
+        activity0: "Sedentary (little/no exercise)",
+        activity1: "Lightly active (1–3 days/week)",
+        activity2: "Moderately active (3–5 days/week)",
+        activity3: "Very active (6–7 days/week)",
+        activity4: "Extra active (very hard exercise)",
+        goalLabel: "Goal",
+        goalMaintain: "Maintain",
+        goalMildLoss: "Mild weight loss (-10%)",
+        goalLoss: "Weight loss (-20%)",
+        goalAggressiveLoss: "Aggressive weight loss (-25%)",
+        goalGain: "Weight gain (+10%)",
+        unitsLabel: "Units",
+        unitsMetric: "Metric (kg, cm)",
+        unitsImperial: "Imperial (lb, in)",
+        calculateBtn: "Calculate",
+        resetBtn: "Reset",
+        resultLabel: "Results",
+        bmrLabel: "BMR",
+        tdeeLabel: "TDEE",
+        goalCalLabel: "Recommended daily calories",
+        disclaimer: "Results are estimates only.",
+        errorInvalid: "Please fill in all fields correctly.",
+      },
+      de: {
+        title: "Kalorienrechner",
+        subtitle: "Personalisierter Kalorienrechner",
+        calculatorHeading: "Kalorienrechner",
+        heroText: "Berechne BMR und TDEE mit der Mifflin-St Jeor Formel.",
+        weightLabel: "Gewicht (kg)",
+        weightPlaceholder: "z.B. 72",
+        heightLabel: "Größe (cm)",
+        heightPlaceholder: "z.B. 175",
+        ageLabel: "Alter",
+        agePlaceholder: "z.B. 30",
+        sexLabel: "Geschlecht",
+        male: "Männlich",
+        female: "Weiblich",
+        activityLabel: "Aktivität",
+        activity0: "Sesshaft",
+        activity1: "Leicht aktiv",
+        activity2: "Mäßig aktiv",
+        activity3: "Sehr aktiv",
+        activity4: "Extrem aktiv",
+        goalLabel: "Ziel",
+        goalMaintain: "Erhalten",
+        goalMildLoss: "Leichter Gewichtsverlust (-10%)",
+        goalLoss: "Gewichtsverlust (-20%)",
+        goalAggressiveLoss: "Starker Gewichtsverlust (-25%)",
+        goalGain: "Gewichtszunahme (+10%)",
+        unitsLabel: "Einheiten",
+        unitsMetric: "Metrisch (kg, cm)",
+        unitsImperial: "Imperial (lb, in)",
+        calculateBtn: "Berechnen",
+        resetBtn: "Zurücksetzen",
+        resultLabel: "Ergebnisse",
+        bmrLabel: "BMR",
+        tdeeLabel: "TDEE",
+        goalCalLabel: "Empfohlene tägliche Kalorien",
+        disclaimer: "Ergebnisse sind nur Schätzungen.",
+        errorInvalid: "Bitte füllen Sie alle Felder korrekt aus.",
+      },
+      es: {
+        title: "Calculadora de Calorías",
+        subtitle: "Calculadora personalizada de calorías",
+        calculatorHeading: "Calculadora de Calorías",
+        heroText: "Calcula BMR y TDEE usando la ecuación Mifflin–St Jeor.",
+        weightLabel: "Peso (kg)",
+        weightPlaceholder: "p.ej. 72",
+        heightLabel: "Altura (cm)",
+        heightPlaceholder: "p.ej. 175",
+        ageLabel: "Edad",
+        agePlaceholder: "p.ej. 30",
+        sexLabel: "Sexo",
+        male: "Hombre",
+        female: "Mujer",
+        activityLabel: "Actividad",
+        activity0: "Sedentario",
+        activity1: "Ligeramente activo",
+        activity2: "Moderadamente activo",
+        activity3: "Muy activo",
+        activity4: "Extremadamente activo",
+        goalLabel: "Objetivo",
+        goalMaintain: "Mantener",
+        goalMildLoss: "Pérdida leve (-10%)",
+        goalLoss: "Pérdida (-20%)",
+        goalAggressiveLoss: "Pérdida agresiva (-25%)",
+        goalGain: "Ganar peso (+10%)",
+        unitsLabel: "Unidades",
+        unitsMetric: "Métrico (kg, cm)",
+        unitsImperial: "Imperial (lb, in)",
+        calculateBtn: "Calcular",
+        resetBtn: "Restablecer",
+        resultLabel: "Resultados",
+        bmrLabel: "BMR",
+        tdeeLabel: "TDEE",
+        goalCalLabel: "Calorías diarias recomendadas",
+        disclaimer: "Los resultados son estimaciones.",
+        errorInvalid: "Por favor complete correctamente todos los campos.",
+      },
+      ru: {
+        title: "Калькулятор Калорий",
+        subtitle: "Персональный калькулятор калорий",
+        calculatorHeading: "Калькулятор Калорий",
+        heroText: "Вычисление BMR и TDEE по формуле Mifflin–St Jeor.",
+        weightLabel: "Вес (кг)",
+        weightPlaceholder: "например 72",
+        heightLabel: "Рост (см)",
+        heightPlaceholder: "например 175",
+        ageLabel: "Возраст",
+        agePlaceholder: "например 30",
+        sexLabel: "Пол",
+        male: "Мужчина",
+        female: "Женщина",
+        activityLabel: "Активность",
+        activity0: "Малоактивный",
+        activity1: "Слегка активный",
+        activity2: "Умеренно активный",
+        activity3: "Очень активный",
+        activity4: "Экстра активный",
+        goalLabel: "Цель",
+        goalMaintain: "Поддержание",
+        goalMildLoss: "Лёгкая потеря веса (-10%)",
+        goalLoss: "Потеря веса (-20%)",
+        goalAggressiveLoss: "Быстрая потеря (-25%)",
+        goalGain: "Набор веса (+10%)",
+        unitsLabel: "Единицы",
+        unitsMetric: "Метрические (кг, см)",
+        unitsImperial: "Имперские (lb, in)",
+        calculateBtn: "Рассчитать",
+        resetBtn: "Сброс",
+        resultLabel: "Результаты",
+        bmrLabel: "BMR",
+        tdeeLabel: "TDEE",
+        goalCalLabel: "Рекомендуемые калории в день",
+        disclaimer: "Результаты — приблизительные.",
+        errorInvalid: "Пожалуйста, заполните все поля корректно.",
+      }
+    };
+
+    // -------------------- Utility --------------------
+    function translateAll(lang) {
+      // Save preference
+      try { localStorage.setItem('lang', lang); } catch(e){}
+      document.documentElement.lang = lang;
+
+      // Translate text nodes
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        const txt = (translations[lang] && translations[lang][key]) || (translations['en'] && translations['en'][key]) || key;
+        if (el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea') {
+          el.value = txt;
+        } else if (el.tagName.toLowerCase() === 'title') {
+          document.title = txt;
+        } else {
+          el.textContent = txt;
+        }
+      });
+
+      // Translate placeholders
+      document.querySelectorAll('[data-translate-placeholder]').forEach(inp => {
+        const key = inp.getAttribute('data-translate-placeholder');
+        inp.setAttribute('placeholder', (translations[lang] && translations[lang][key]) || '');
+      });
+
+      // Translate option texts for selects that have data-translate on options
+      document.querySelectorAll('option[data-translate]').forEach(opt => {
+        const key = opt.getAttribute('data-translate');
+        opt.textContent = (translations[lang] && translations[lang][key]) || opt.textContent;
+      });
+
+      // Radio labels (span inside label with data-translate)
+      document.querySelectorAll('label span[data-translate]').forEach(sp => {
+        const key = sp.getAttribute('data-translate');
+        sp.textContent = (translations[lang] && translations[lang][key]) || sp.textContent;
+      });
+
+      // Update calculate button text
+      const calcBtn = document.getElementById('calculateBtn');
+      if (calcBtn) calcBtn.textContent = (translations[lang] && translations[lang]['calculateBtn']) || calcBtn.textContent;
+
+      // Update reset button
+      const resetBtn = document.getElementById('resetBtn');
+      if (resetBtn) resetBtn.textContent = (translations[lang] && translations[lang]['resetBtn']) || resetBtn.textContent;
+    }
+
+    function initLanguage() {
+      const saved = (function(){ try { return localStorage.getItem('lang'); } catch(e){return null;} })();
+      const browser = navigator.language ? navigator.language.slice(0,2) : 'en';
+      const start = saved || (translations[browser] ? browser : 'tr');
+      translateAll(start);
+      // highlight active flag (simple)
+      document.querySelectorAll('.flag-btn').forEach(btn => {
+        btn.style.opacity = (btn.getAttribute('data-lang') === start) ? '1' : '0.75';
+      });
+    }
+
+    // -------------------- Calculation --------------------
+    function showError(msg){
+      const el = document.getElementById('error');
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+    function clearError(){
+      const el = document.getElementById('error');
+      el.style.display = 'none';
+      el.textContent = '';
+    }
+
+    function calculateCalories(){
+      clearError();
+      const lang = document.documentElement.lang || 'tr';
+      const units = document.getElementById('units').value;
+      const weightIn = parseFloat(document.getElementById('weight').value);
+      const heightIn = parseFloat(document.getElementById('height').value);
+      const age = parseInt(document.getElementById('age').value, 10);
+      const sex = document.querySelector('input[name="sex"]:checked') ? document.querySelector('input[name="sex"]:checked').value : 'male';
+      const activity = parseFloat(document.getElementById('activity').value);
+      const goal = document.getElementById('goal').value;
+
+      // Validation
+      if (!isFinite(weightIn) || !isFinite(heightIn) || !isFinite(age) || weightIn <= 0 || heightIn <= 0 || age <= 0) {
+        showError((translations[lang] && translations[lang].errorInvalid) || translations['en'].errorInvalid);
+        return;
+      }
+
+      // Units conversion
+      let weightKg = weightIn;
+      let heightCm = heightIn;
+      if (units === 'imperial') {
+        // lb -> kg, in -> cm
+        weightKg = weightIn * 0.45359237;
+        heightCm = heightIn * 2.54;
+      }
+
+      // BMR (Mifflin-St Jeor)
+      // 10 * weight(kg) + 6.25 * height(cm) - 5 * age [+5 for men, -161 for women]
+      const bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + (sex === 'male' ? 5 : -161);
+
+      const tdee = bmr * activity;
+
+      const goalAdjustMap = { maintain: 0, mild: -0.10, loss: -0.20, aggressive: -0.25, gain: 0.10 };
+      const adjust = goalAdjustMap[goal] || 0;
+      const recommended = Math.round(tdee * (1 + adjust));
+
+      // Round for display
+      const bmrDisplay = Math.round(bmr);
+      const tdeeDisplay = Math.round(tdee);
+
+      // Update UI
+      document.getElementById('bmrResult').textContent = bmrDisplay + ' kcal/gün';
+      document.getElementById('tdeeResult').textContent = tdeeDisplay + ' kcal/gün';
+      document.getElementById('goalResult').textContent = recommended + ' kcal/gün';
+
+    }
+
+    function resetForm(){
+      document.getElementById('calorieForm').reset();
+      clearError();
+      document.getElementById('bmrResult').textContent = '—';
+      document.getElementById('tdeeResult').textContent = '—';
+      document.getElementById('goalResult').textContent = '—';
+    }
+
+    // -------------------- Events --------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+
+      // flags
+      document.querySelectorAll('.flag-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang');
+          translateAll(lang);
+          document.querySelectorAll('.flag-btn').forEach(b => b.style.opacity = (b === btn ? '1' : '0.75'));
+        });
+      });
+
+      // quick enter key on inputs triggers calculation
+      ['weight','height','age'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); calculateCalories(); } });
+      });
+
+      // persist units and restore if found
+      try { const units = localStorage.getItem('units'); if (units) document.getElementById('units').value = units; } catch(e){}
+      document.getElementById('units').addEventListener('change', (e) => { try { localStorage.setItem('units', e.target.value); } catch(err){} });
+
+    });
+  </script>
+</body>
+</html>
