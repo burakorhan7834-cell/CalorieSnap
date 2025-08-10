@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f9f9f9" rx="20" ry="20"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="650" cy="100" r="80" fill="#C8E6C9" opacity="0.7"/>
+  <circle cx="150" cy="500" r="100" fill="#C8E6C9" opacity="0.5"/>
+  
+  <!-- Plate with Healthy Food -->
+  <circle cx="250" cy="300" r="120" fill="#FFFFFF" stroke="#4CAF50" stroke-width="3"/>
+  
+  <!-- Apple -->
+  <circle cx="200" cy="250" r="30" fill="#FF5252"/>
+  <path d="M200 220 Q205 215 210 220" stroke="#388E3C" stroke-width="2" fill="none"/>
+  <path d="M200 220 L195 210" stroke="#388E3C" stroke-width="2" fill="none"/>
+  
+  <!-- Broccoli -->
+  <circle cx="250" cy="260" r="25" fill="#388E3C"/>
+  <circle cx="235" cy="245" r="10" fill="#4CAF50"/>
+  <circle cx="265" cy="245" r="10" fill="#4CAF50"/>
+  <circle cx="250" cy="235" r="10" fill="#4CAF50"/>
+  <rect x="245" y="285" width="10" height="20" fill="#8D6E63"/>
+  
+  <!-- Carrot -->
+  <path d="M300 260 L320 290 L280 290 Z" fill="#FF9800"/>
+  <path d="M300 240 L300 260" stroke="#4CAF50" stroke-width="2"/>
+  <path d="M295 245 L305 245" stroke="#4CAF50" stroke-width="2"/>
+  <path d="M290 250 L310 250" stroke="#4CAF50" stroke-width="2"/>
+  
+  <!-- Fish (Protein) -->
+  <path d="M230 330 Q270 300 310 330 Q270 360 230 330 Z" fill="#B3E5FC"/>
+  <circle cx="270" cy="320" r="5" fill="#000000"/>
+  <path d="M310 330 L325 340 L325 320 Z" fill="#B3E5FC"/>
+  
+  <!-- Running Person -->
+  <circle cx="550" cy="280" r="40" fill="#FFA000"/>
+  <line x1="550" y1="320" x2="550" y2="400" stroke="#333333" stroke-width="6"/>
+  <line x1="550" y1="340" x2="510" y2="380" stroke="#333333" stroke-width="6"/>
+  <line x1="550" y1="340" x2="590" y2="380" stroke="#333333" stroke-width="6"/>
+  <line x1="550" y1="400" x2="520" y2="460" stroke="#333333" stroke-width="6"/>
+  <line x1="550" y1="400" x2="580" y2="460" stroke="#333333" stroke-width="6"/>
+  
+  <!-- Measuring Tape -->
+  <path d="M400 450 Q500 500 600 450" stroke="#FFC107" stroke-width="10" fill="none"/>
+  <path d="M400 450 Q500 500 600 450" stroke="#000000" stroke-width="1" fill="none" stroke-dasharray="5,5"/>
+  <rect x="490" y="480" width="20" height="10" fill="#FFC107"/>
+  
+  <!-- Text Elements -->
+  <text x="400" y="150" font-family="Arial" font-size="24" fill="#388E3C" text-anchor="middle">Sağlıklı Beslenme</text>
+  <text x="400" y="180" font-family="Arial" font-size="18" fill="#666666" text-anchor="middle">Kalori Hesaplama</text>
+</svg>
